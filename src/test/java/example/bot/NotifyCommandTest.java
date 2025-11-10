@@ -112,7 +112,9 @@ class NotifyCommandTest {
             if (bot.hasMessage(chat, text)) {
                 return System.currentTimeMillis();
             }
-            try { Thread.sleep(10); } catch (InterruptedException ignored) {}
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ignored) {}
         }
         return -1;
     }
