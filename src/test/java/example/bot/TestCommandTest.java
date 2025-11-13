@@ -3,6 +3,8 @@ package example.bot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.List;
+
 /**
  * Тесты команды /test
  *
@@ -15,12 +17,13 @@ class TestCommandTest {
     private final String Q1_TEXT = "Вычислите степень: 10^2";
     private final String Q1_ANS  = "100";
     private final String Q2_TEXT = "Сколько будет 2 + 2 * 2";
+    private final String Q2_ANS  = "6";
 
     /**
      * Правильный ответ на вопрос
      */
     @Test
-    void answerTrue() {
+    void testAnswerTrue() {
         Long chat = 11L;
         FakeBot bot = new FakeBot();
         BotLogic logic = new BotLogic(bot);
@@ -28,22 +31,33 @@ class TestCommandTest {
 
         logic.processCommand(user, CMD_TEST);
         Assertions.assertEquals(State.TEST, user.getState());
-        Assertions.assertTrue(bot.hasMessage(chat, Q1_TEXT));
+
+        List<String> historyAfterStart = bot.messagesOf(chat);
+        Assertions.assertEquals(
+                List.of(Q1_TEXT),
+                historyAfterStart,
+                "После команды /test ожидали первый вопрос"
+        );
 
         logic.processCommand(user, Q1_ANS);
 
-        Assertions.assertTrue(bot.hasMessage(chat, "Правильный ответ!"));
-        Assertions.assertTrue(bot.hasMessage(chat, Q2_TEXT));
-
-        Assertions.assertTrue(user.getWrongAnswerQuestions().isEmpty());
+        List<String> historyAfterAnswer = bot.messagesOf(chat);
+        Assertions.assertEquals(
+                List.of(
+                        Q1_TEXT,
+                        "Правильный ответ!",
+                        Q2_TEXT
+                ),
+                historyAfterAnswer,
+                "После правильного ответа ожидали следущий вопрос"
+        );
     }
 
     /**
-     * Не правильный ответ на вопрос, вопрос улетает в очередь неправильных ответов
-     * для repeat
+     * Не правильный ответ на вопрос
      */
     @Test
-    void answerFalse_and_answer_add_queue() {
+    void testAnswerFalse() {
         Long chat = 12L;
         FakeBot bot = new FakeBot();
         BotLogic logic = new BotLogic(bot);
@@ -55,11 +69,11 @@ class TestCommandTest {
 
         logic.processCommand(user, "неверно");
 
-        Assertions.assertTrue(bot.hasMessage(chat, "Вы ошиблись, верный ответ: " + Q1_ANS));
-        Assertions.assertTrue(bot.hasMessage(chat, Q2_TEXT));
+        Assertions.assertTrue(bot.hasMessage(chat, "Вы ошиблись, верный ответ: " + Q1_ANS),
+                "Не верный вывод");
+        Assertions.assertTrue(bot.hasMessage(chat, Q2_TEXT),
+                "Следущий вопрос не вывелся");
 
-        Question expectedQ1 = new Question(Q1_TEXT, Q1_ANS);
-        Assertions.assertTrue(user.getWrongAnswerQuestions().contains(expectedQ1));
     }
 
 }

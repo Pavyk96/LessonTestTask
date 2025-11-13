@@ -16,18 +16,16 @@ class ContainerTest {
      */
     @Test
     void add_and_size() {
-        Container c = new Container();
-        Item i1 = new Item(1);
-        Item i2 = new Item(2);
-        Item i3 = new Item(3);
+        Container container = new Container();
+        Item item1 = new Item(1);
+        Item item2 = new Item(2);
 
-        c.add(i1);
-        c.add(i2);
-        c.add(i3);
+        container.add(item1);
+        container.add(item2);
 
-        Assertions.assertEquals(3, c.size());
-        Assertions.assertTrue(c.contains(i1));
-        Assertions.assertTrue(c.contains(i2));
+        Assertions.assertEquals(2, container.size());
+        Assertions.assertTrue(container.contains(item1));
+        Assertions.assertTrue(container.contains(item2));
     }
 
     /**
@@ -35,18 +33,18 @@ class ContainerTest {
      */
     @Test
     void remove() {
-        Container c = new Container();
-        Item i1 = new Item(1);
-        Item i2 = new Item(2);
+        Container container = new Container();
+        Item item1 = new Item(1);
+        Item item2 = new Item(2);
 
-        c.add(i1);
-        c.add(i2);
+        container.add(item1);
+        container.add(item2);
 
-        c.remove(i1);
+        container.remove(item1);
 
-        Assertions.assertEquals(1, c.size());
-        Assertions.assertFalse(c.contains(i1));
-        Assertions.assertTrue(c.contains(i2));
+        Assertions.assertEquals(1, container.size());
+        Assertions.assertFalse(container.contains(item1));
+        Assertions.assertTrue(container.contains(item2));
     }
 
 }

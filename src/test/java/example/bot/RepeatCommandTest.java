@@ -20,7 +20,7 @@ class RepeatCommandTest {
      * Нет вопросов для повторения
      */
     @Test
-    void no_question_to_repeat() {
+    void testEmptyRepeatQueue() {
         Long chat = 41L;
         FakeBot bot = new FakeBot();
         BotLogic logic = new BotLogic(bot);
@@ -29,16 +29,19 @@ class RepeatCommandTest {
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Нет вопросов для повторения")
+                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                "Бот не отправил сообщение 'Нет вопросов для повторения'. "
         );
         Assertions.assertEquals(State.INIT, user.getState());
     }
 
     /**
-     * Есть вопросы для повторения
+     * Есть вопрос для повторения
+     * Проверяем, что при двойном неправильном ответе на вопрос,
+     * при команде репит, вопрос будет выводиться 1 раз
      */
     @Test
-    void exist_question_to_repeat() {
+    void testTwoSameQuestionToRepeat() {
         Long chat = 42L;
         FakeBot bot = new FakeBot();
         BotLogic logic = new BotLogic(bot);
@@ -46,16 +49,24 @@ class RepeatCommandTest {
 
         logic.processCommand(user, CMD_TEST);
         logic.processCommand(user, "неверно");
-
-        Question expectedQ1 = new Question(Q1_TEXT, Q1_ANS);
-        Assertions.assertTrue(
-                user.getWrongAnswerQuestions().contains(expectedQ1)
-        );
+        logic.processCommand(user, CMD_TEST);
+        logic.processCommand(user, "неверно");
 
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertEquals(State.REPEAT, user.getState());
         Assertions.assertTrue(
-                bot.hasMessage(chat, Q1_TEXT));
+                bot.hasMessage(chat, Q1_TEXT),
+                "Нет вопроса для повторения"
+        );
+
+        logic.processCommand(user, Q1_ANS);
+        logic.processCommand(user, CMD_REPEAT);
+
+        Assertions.assertTrue(
+                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                "Вывелся лишний вопрос"
+        );
     }
+
 }

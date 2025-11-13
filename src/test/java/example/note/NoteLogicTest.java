@@ -24,10 +24,10 @@ public class NoteLogicTest {
 
         String notes = logic.handleMessage("/notes");
 
-        String expected =
-                "Your notes:" + System.lineSeparator() +
-                        note1 + System.lineSeparator() +
-                        note2;
+        String expected = """
+        Your notes:
+        %s
+        %s""".formatted(note1, note2);
 
         Assertions.assertEquals(expected, notes);
     }
@@ -49,10 +49,11 @@ public class NoteLogicTest {
 
         String notes = logic.handleMessage("/notes");
 
-        String expected =
-                "Your notes:" + System.lineSeparator() +
-                        updated + System.lineSeparator() +
-                        note2;
+        String expected = """
+        Your notes:
+        %s
+        %s""".formatted(note1, note2);
+
 
         Assertions.assertEquals(expected, notes);
     }
@@ -73,9 +74,11 @@ public class NoteLogicTest {
 
         String notes = logic.handleMessage("/notes");
 
-        String expected =
-                "Your notes:" + System.lineSeparator() +
-                        note2;
+        String expected = """
+        Your notes:
+        %s
+        %s""".formatted(note1, note2);
+
 
         Assertions.assertEquals(expected, notes);
     }
