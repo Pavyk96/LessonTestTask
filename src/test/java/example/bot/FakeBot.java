@@ -33,4 +33,13 @@ public final class FakeBot implements Bot {
         return false;
     }
 
+    /** Последнее отправленное сообщение чата */
+    public String lastMessage(Long chatId) {
+        List<String> list = messagesByChat.get(chatId);
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(list.size() - 1);
+    }
+
 }

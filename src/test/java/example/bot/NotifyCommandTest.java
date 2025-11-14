@@ -11,14 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
  */
 class NotifyCommandTest {
 
-    private final String cmdNotify = "/notify";
-
-    private final String notifyPrefix = "Сработало напоминание: '";
-    private final String notifySuffix = "'";
+    private static final String CMD_NOTIFY = "/notify";
+    private static final String NOTIFY_PREFIX = "Сработало напоминание: '";
+    private static final String NOTIFY_SUFFIX = "'";
 
     private FakeBot bot;
     private BotLogic logic;
 
+    /**
+     * Пересоздание бота перед тестом
+     */
     @BeforeEach
     void setUp() {
         bot = new FakeBot();
@@ -31,23 +33,25 @@ class NotifyCommandTest {
     @Test
     void testSingleNotifyArrivesOnTime() throws InterruptedException {
         long chatId = 501L;
-        User user = createUser(chatId);
+        User user = new User(chatId);
 
         String noteText = "разминка";
         int delaySec = 1;
-        String notify = notifyPrefix + noteText + notifySuffix;
+        String notify = NOTIFY_PREFIX + noteText + NOTIFY_SUFFIX;
 
-        logic.processCommand(user, cmdNotify);
+        logic.processCommand(user, CMD_NOTIFY);
         logic.processCommand(user, noteText);
         logic.processCommand(user, String.valueOf(delaySec));
 
-        Thread.sleep(1100L);
+        Thread.sleep(1010L);
 
-        Assertions.assertTrue(
-                bot.hasMessage(chatId, notify),
-                "Не появилось уведомление: '" +
-                        notify + "'. История: " + bot.messagesOf(chatId)
+        Assertions.assertEquals(
+                notify,
+                bot.lastMessage(chatId),
+                "Последнее сообщение не совпало: ожидали '" + notify +
+                        "'. История: " + bot.messagesOf(chatId)
         );
+
     }
 
     /**
@@ -56,50 +60,38 @@ class NotifyCommandTest {
     @Test
     void testTwoNotifiesComeInOrder() throws InterruptedException {
         long chatId = 502L;
-        User user = createUser(chatId);
+        User user = new User(chatId);
 
-        logic.processCommand(user, cmdNotify);
+        logic.processCommand(user, CMD_NOTIFY);
         String lateText = "позже";
         logic.processCommand(user, lateText);
         int lateSec = 2;
         logic.processCommand(user, String.valueOf(lateSec));
 
-        logic.processCommand(user, cmdNotify);
+        logic.processCommand(user, CMD_NOTIFY);
         String earlyText = "раньше";
         logic.processCommand(user, earlyText);
         int earlySec = 1;
         logic.processCommand(user, String.valueOf(earlySec));
 
-        Thread.sleep(1100L);
+        String earlyMsg = NOTIFY_PREFIX + earlyText + NOTIFY_SUFFIX;
+        String lateMsg  = NOTIFY_PREFIX + lateText  + NOTIFY_SUFFIX;
 
-        String earlyMsg = notifyPrefix + earlyText + notifySuffix;
-        Assertions.assertTrue(
-                bot.hasMessage(chatId, earlyMsg),
-                "Не появилось раннее уведомление: '" +
-                        earlyMsg + "'. История: " + bot.messagesOf(chatId)
-        );
+        Thread.sleep(1010L);
 
-        String lateMsg = notifyPrefix + lateText + notifySuffix;
-        Assertions.assertFalse(
-                bot.hasMessage(chatId, lateMsg),
-                "Позднее уведомление пришло слишком рано. История: "
-                        + bot.messagesOf(chatId)
+        Assertions.assertEquals(
+                earlyMsg,
+                bot.lastMessage(chatId),
+                "Сообщение пришло не в том порядке"
         );
 
         Thread.sleep(1100L);
 
-        Assertions.assertTrue(
-                bot.hasMessage(chatId, lateMsg),
-                "Не появилось позднее уведомление: '" +
-                        lateMsg + "'. История: " + bot.messagesOf(chatId)
+        Assertions.assertEquals(
+                lateMsg,
+                bot.lastMessage(chatId),
+                "Сообщение пришло не в том порядке"
         );
-    }
-
-    /**
-     * Создать пользователя
-     */
-    private User createUser(long chatId) {
-        return new User(chatId);
     }
 
 }

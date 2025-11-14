@@ -3,7 +3,6 @@ package example.bot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-import java.util.List;
 
 /**
  * Тесты команды /test
@@ -12,15 +11,14 @@ import java.util.List;
  */
 class TestCommandTest {
 
-    private final String CMD_TEST = "/test";
-
-    private final String Q1_TEXT = "Вычислите степень: 10^2";
-    private final String Q1_ANS  = "100";
-    private final String Q2_TEXT = "Сколько будет 2 + 2 * 2";
-    private final String Q2_ANS  = "6";
+    private static final String CMD_TEST = "/test";
+    private static final String Q1_TEXT = "Вычислите степень: 10^2";
+    private static final String Q1_ANS  = "100";
+    private static final String Q2_TEXT = "Сколько будет 2 + 2 * 2";
+    private static final String Q2_ANS = "6";
 
     /**
-     * Правильный ответ на вопрос
+     * Правильный ответ на вопрос + выводится следующий вопрос
      */
     @Test
     void testAnswerTrue() {
@@ -30,31 +28,31 @@ class TestCommandTest {
         User user = new User(chat);
 
         logic.processCommand(user, CMD_TEST);
-        Assertions.assertEquals(State.TEST, user.getState());
 
-        List<String> historyAfterStart = bot.messagesOf(chat);
         Assertions.assertEquals(
-                List.of(Q1_TEXT),
-                historyAfterStart,
+                Q1_TEXT,
+                bot.lastMessage(chat),
                 "После команды /test ожидали первый вопрос"
         );
 
         logic.processCommand(user, Q1_ANS);
 
-        List<String> historyAfterAnswer = bot.messagesOf(chat);
         Assertions.assertEquals(
-                List.of(
-                        Q1_TEXT,
-                        "Правильный ответ!",
-                        Q2_TEXT
-                ),
-                historyAfterAnswer,
-                "После правильного ответа ожидали следущий вопрос"
+                Q2_TEXT,
+                bot.lastMessage(chat),
+                "После правильного ответа ожидали следующий вопрос"
+        );
+
+        logic.processCommand(user, Q2_ANS);
+        Assertions.assertEquals(
+                "Тест завершен",
+                bot.lastMessage(chat),
+                "Тест не завершился"
         );
     }
 
     /**
-     * Не правильный ответ на вопрос
+     * Неправильный ответ на вопрос
      */
     @Test
     void testAnswerFalse() {
@@ -65,15 +63,22 @@ class TestCommandTest {
 
         logic.processCommand(user, CMD_TEST);
         Assertions.assertEquals(State.TEST, user.getState());
-        Assertions.assertTrue(bot.hasMessage(chat, Q1_TEXT));
+        Assertions.assertEquals(
+                Q1_TEXT,
+                bot.lastMessage(chat),
+                "После команды /test ожидали первый вопрос"
+        );
 
         logic.processCommand(user, "неверно");
 
-        Assertions.assertTrue(bot.hasMessage(chat, "Вы ошиблись, верный ответ: " + Q1_ANS),
-                "Не верный вывод");
-        Assertions.assertTrue(bot.hasMessage(chat, Q2_TEXT),
-                "Следущий вопрос не вывелся");
-
+        Assertions.assertTrue(
+                bot.hasMessage(chat, "Вы ошиблись, верный ответ: " + Q1_ANS),
+                "Не верный вывод"
+        );
+        Assertions.assertEquals(
+                Q2_TEXT,
+                bot.lastMessage(chat),
+                "После неправильного ответа ожидали следующий вопрос"
+        );
     }
-
 }

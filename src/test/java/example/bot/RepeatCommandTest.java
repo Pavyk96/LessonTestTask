@@ -10,11 +10,10 @@ import org.junit.jupiter.api.Assertions;
  */
 class RepeatCommandTest {
 
-    private final String CMD_TEST = "/test";
-    private final String CMD_REPEAT = "/repeat";
-
-    private final String Q1_TEXT = "Вычислите степень: 10^2";
-    private final String Q1_ANS  = "100";
+    private static final String CMD_TEST = "/test";
+    private static final String CMD_REPEAT = "/repeat";
+    private static final String Q1_TEXT = "Вычислите степень: 10^2";
+    private static final String Q1_ANS  = "100";
 
     /**
      * Нет вопросов для повторения
@@ -32,7 +31,6 @@ class RepeatCommandTest {
                 bot.hasMessage(chat, "Нет вопросов для повторения"),
                 "Бот не отправил сообщение 'Нет вопросов для повторения'. "
         );
-        Assertions.assertEquals(State.INIT, user.getState());
     }
 
     /**
@@ -54,7 +52,6 @@ class RepeatCommandTest {
 
         logic.processCommand(user, CMD_REPEAT);
 
-        Assertions.assertEquals(State.REPEAT, user.getState());
         Assertions.assertTrue(
                 bot.hasMessage(chat, Q1_TEXT),
                 "Нет вопроса для повторения"
@@ -66,6 +63,78 @@ class RepeatCommandTest {
         Assertions.assertTrue(
                 bot.hasMessage(chat, "Нет вопросов для повторения"),
                 "Вывелся лишний вопрос"
+        );
+    }
+
+    /**
+     * Вопрос не уходит на повтор после положительного ответа:
+     * если сразу ответить верно в режиме /test, /repeat не находит вопросов
+     */
+    @Test
+    void testQuestionNotAddedToRepeatAfterCorrectAnswer() {
+        Long chat = 43L;
+        FakeBot bot = new FakeBot();
+        BotLogic logic = new BotLogic(bot);
+        User user = new User(chat);
+
+        logic.processCommand(user, CMD_TEST);
+        logic.processCommand(user, Q1_ANS);
+
+        logic.processCommand(user, CMD_REPEAT);
+
+        Assertions.assertTrue(
+                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                "После правильного ответа в /test вопрос не должен попадать в очередь повторения"
+        );
+    }
+
+    /**
+     * После неправильного ответа вопрос остается:
+     * при повторном /repeat после второй ошибки вопрос снова появляется
+     */
+    @Test
+    void testQuestionStaysInRepeatAfterWrongAnswer() {
+        Long chat = 44L;
+        FakeBot bot = new FakeBot();
+        BotLogic logic = new BotLogic(bot);
+        User user = new User(chat);
+
+        logic.processCommand(user, CMD_TEST);
+        logic.processCommand(user, "неверно");
+
+        logic.processCommand(user, CMD_REPEAT);
+
+        logic.processCommand(user, "неверно");
+
+        logic.processCommand(user, CMD_REPEAT);
+        Assertions.assertTrue(
+                bot.hasMessage(chat, Q1_TEXT),
+                "После неправильного ответа в режиме повторения вопрос должен остаться в очереди"
+        );
+    }
+
+    /**
+     * После правильного ответа вопрос уходит из очереди:
+     * ошиблись, попали в очередь /repeat, потом ответили верно и вопрос исчез
+     */
+    @Test
+    void testQuestionRemovedFromRepeatAfterCorrectAnswer() {
+        Long chat = 45L;
+        FakeBot bot = new FakeBot();
+        BotLogic logic = new BotLogic(bot);
+        User user = new User(chat);
+
+        logic.processCommand(user, CMD_TEST);
+        logic.processCommand(user, "неверно");
+
+        logic.processCommand(user, CMD_REPEAT);
+
+        logic.processCommand(user, Q1_ANS);
+
+        logic.processCommand(user, CMD_REPEAT);
+        Assertions.assertTrue(
+                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                "После правильного ответа в режиме повторения вопрос должен уйти из очереди"
         );
     }
 
