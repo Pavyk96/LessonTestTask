@@ -17,17 +17,17 @@ public final class FakeBot implements Bot {
     }
 
     /** Все сообщения (для любого chatId — история общая) */
-    public List<String> messagesOf(Long chatId) {
+    public List<String> messagesOf() {
         return List.copyOf(messages);
     }
 
     /** Есть ли среди сообщений текст, равный text */
-    public boolean hasMessage(Long chatId, String text) {
+    public boolean hasMessage(String text) {
         return messages.contains(text);
     }
 
     /** Последнее отправленное сообщение */
-    public String lastMessage(Long chatId) {
+    public String lastMessage() {
         if (messages.isEmpty()) {
             return null;
         }

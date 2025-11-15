@@ -47,9 +47,9 @@ class NotifyCommandTest {
 
         Assertions.assertEquals(
                 notify,
-                bot.lastMessage(chatId),
+                bot.lastMessage(),
                 "Последнее сообщение не совпало: ожидали '" + notify +
-                        "'. История: " + bot.messagesOf(chatId)
+                        "'. История: " + bot.messagesOf()
         );
 
     }
@@ -81,7 +81,7 @@ class NotifyCommandTest {
 
         Assertions.assertEquals(
                 earlyMsg,
-                bot.lastMessage(chatId),
+                bot.lastMessage(),
                 "Сообщение пришло не в том порядке"
         );
 
@@ -89,7 +89,7 @@ class NotifyCommandTest {
 
         Assertions.assertEquals(
                 lateMsg,
-                bot.lastMessage(chatId),
+                bot.lastMessage(),
                 "Сообщение пришло не в том порядке"
         );
     }

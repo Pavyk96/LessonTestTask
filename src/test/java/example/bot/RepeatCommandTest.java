@@ -28,7 +28,7 @@ class RepeatCommandTest {
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                bot.hasMessage("Нет вопросов для повторения"),
                 "Бот не отправил сообщение 'Нет вопросов для повторения'. "
         );
     }
@@ -53,7 +53,7 @@ class RepeatCommandTest {
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, QUESTION_1_TEXT),
+                bot.hasMessage(QUESTION_1_TEXT),
                 "Нет вопроса для повторения"
         );
 
@@ -61,7 +61,7 @@ class RepeatCommandTest {
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                bot.hasMessage("Нет вопросов для повторения"),
                 "Вывелся лишний вопрос"
         );
     }
@@ -83,7 +83,7 @@ class RepeatCommandTest {
         logic.processCommand(user, CMD_REPEAT);
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                bot.hasMessage("Нет вопросов для повторения"),
                 "После правильного ответа в /test вопрос не должен попадать в очередь повторения"
         );
     }
@@ -108,7 +108,7 @@ class RepeatCommandTest {
 
         logic.processCommand(user, CMD_REPEAT);
         Assertions.assertTrue(
-                bot.hasMessage(chat, QUESTION_1_TEXT),
+                bot.hasMessage(QUESTION_1_TEXT),
                 "После неправильного ответа в режиме повторения вопрос должен остаться в очереди"
         );
     }
@@ -133,7 +133,7 @@ class RepeatCommandTest {
 
         logic.processCommand(user, CMD_REPEAT);
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Нет вопросов для повторения"),
+                bot.hasMessage("Нет вопросов для повторения"),
                 "После правильного ответа в режиме повторения вопрос должен уйти из очереди"
         );
     }

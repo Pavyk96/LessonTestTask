@@ -36,7 +36,7 @@ class TestCommandTest {
 
         Assertions.assertEquals(
                 QUESTION_1_TEXT,
-                bot.lastMessage(chat),
+                bot.lastMessage(),
                 "После команды /test ожидали первый вопрос"
         );
 
@@ -44,14 +44,14 @@ class TestCommandTest {
 
         Assertions.assertEquals(
                 QUESTION_2_TEXT,
-                bot.lastMessage(chat),
+                bot.lastMessage(),
                 "После правильного ответа ожидали следующий вопрос"
         );
 
         logic.processCommand(user, QUESTION_2_ANS);
         Assertions.assertEquals(
                 "Тест завершен",
-                bot.lastMessage(chat),
+                bot.lastMessage(),
                 "Тест не завершился"
         );
     }
@@ -70,7 +70,7 @@ class TestCommandTest {
         Assertions.assertEquals(State.TEST, user.getState());
         Assertions.assertEquals(
                 QUESTION_1_TEXT,
-                bot.lastMessage(chat),
+                bot.lastMessage(),
                 "После команды /test ожидали первый вопрос"
         );
 
@@ -83,7 +83,7 @@ class TestCommandTest {
 
         Assertions.assertEquals(
                 QUESTION_2_TEXT,
-                bot.lastMessage(chat),
+                bot.lastMessage(),
                 "После неправильного ответа ожидали следующий вопрос"
         );
     }
