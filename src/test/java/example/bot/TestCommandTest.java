@@ -29,6 +29,11 @@ class TestCommandTest {
 
         logic.processCommand(user, CMD_TEST);
 
+        Assertions.assertTrue(
+                user.getCurrentWrongAnswerQuestion().isEmpty(),
+                "После правильного ответа список неправильных вопросов должен быть пустым"
+        );
+
         Assertions.assertEquals(
                 QUESTION_1_TEXT,
                 bot.lastMessage(chat),
@@ -72,9 +77,10 @@ class TestCommandTest {
         logic.processCommand(user, "неверно");
 
         Assertions.assertTrue(
-                bot.hasMessage(chat, "Вы ошиблись, верный ответ: " + QUESTION_1_ANS),
-                "Не верный вывод"
+                user.getCurrentWrongAnswerQuestion().isPresent(),
+                "После неправильного ответа ожидаем, что текущий неправильный вопрос существует"
         );
+
         Assertions.assertEquals(
                 QUESTION_2_TEXT,
                 bot.lastMessage(chat),
