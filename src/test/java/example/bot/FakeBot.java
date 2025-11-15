@@ -1,45 +1,37 @@
 package example.bot;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-/** Тестовая реализация Bot: накапливает отправленные сообщения по chatId. */
+/**
+ * Тестовая реализация Bot
+ */
 public final class FakeBot implements Bot {
-    private final Map<Long, List<String>> messagesByChat = new LinkedHashMap<>();
+
+    /** Очередь всех сообщений, в порядке отправки */
+    private final List<String> messages = new LinkedList<>();
 
     @Override
     public void sendMessage(Long chatId, String text) {
-        List<String> list = messagesByChat.computeIfAbsent(chatId, k -> new ArrayList<>());
-        list.add(text);
+        messages.add(text);
     }
 
-    /** Доступ к списку сообщений данного чата */
+    /** Все сообщения (для любого chatId — история общая) */
     public List<String> messagesOf(Long chatId) {
-        List<String> list = messagesByChat.get(chatId);
-        return list == null ? List.of() : List.copyOf(list);
+        return List.copyOf(messages);
     }
 
-    /** Есть ли у чата сообщение, равное text */
+    /** Есть ли среди сообщений текст, равный text */
     public boolean hasMessage(Long chatId, String text) {
-        List<String> list = messagesByChat.get(chatId);
-        if (list == null)
-            return false;
-        for (String s : list) {
-            if (text.equals(s))
-                return true;
-        }
-        return false;
+        return messages.contains(text);
     }
 
-    /** Последнее отправленное сообщение чата */
+    /** Последнее отправленное сообщение */
     public String lastMessage(Long chatId) {
-        List<String> list = messagesByChat.get(chatId);
-        if (list == null || list.isEmpty()) {
+        if (messages.isEmpty()) {
             return null;
         }
-        return list.get(list.size() - 1);
+        return messages.get(messages.size() - 1);
     }
 
 }
